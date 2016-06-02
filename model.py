@@ -1,29 +1,48 @@
 """Models
 """
+
 import urllib2
 import bs4
+import datetime
 
 
-def get_soup(url):
+def get_soup(_url):
     """get soup object for a url"""
-    c = urllib2.urlopen(url)
+    c = urllib2.urlopen(_url)
     return bs4.BeautifulSoup(c.read(), 'html.parser')
 
 
+def prepare_str(_str):
+    """remove all '\n's, ','s and ' 's"""
+    return _str.replace('\n', '').replace(',', '').replace(' ', '')
+
+
 class User:
-    def __init__(self, user_id, _novels=False, _blogs=False, _bookmarks=False, _following_users=True,
-                 _commented_novels=False, _review_list=False, _all=False):
+    """User class, decompose key information with a user id"""
+
+    def __init__(self, user_id):
         """init function"""
+        # user id
         self.id = user_id
+        # user name
         self.name = self.get_username()
 
+        # novels written by current user
         self.novels = []
+        # user's blog
         self.blogs = []
+        # bookmarked novels
         self.bookmarks = []
+        # user id list followed by current user
         self.following_users = []
+        # commented novels
         self.commented_novels = []
+        # reviews received
         self.reviews = []
 
+    def init(self, _novels=False, _blogs=False, _bookmarks=False, _following_users=False,
+             _commented_novels=False, _review_list=False, _all=False):
+        """get info from web"""
         if _all:
             self.list_novel()
             self.list_blog()
@@ -196,3 +215,72 @@ class User:
     def page_review(review_id):
         """review page"""
         return 'http://novelcom.syosetu.com/novelreview/list/ncode/' + review_id + '/'
+
+
+class Novel:
+    """Novel class, decompose key information with a novel id"""
+
+    def __init__(self, novel_id):
+        """init function"""
+        self.id = novel_id
+        # title
+        self.title = None
+        # writer's id
+        self.user_id = None
+        # category
+        self.category = None
+        # publication date
+        self.publication_date = None
+        # last update date
+        self.last_date = None
+        # impression count
+        self.impression_count = 0
+        # review count
+        self.review_count = 0
+        # bookmark count
+        self.bookmark_count = 0
+        # assessment
+        self.assessment = 0
+        # writing point
+        self.point_writing = 0
+        # story point
+        self.point_story = 0
+        # character count
+        self.chara_count = 0
+
+    def page_info(self):
+        """info page url"""
+        return 'http://ncode.syosetu.com/novelview/infotop/ncode/' + self.id + '/'
+
+    def get_info(self):
+        """retrieve detailed info from web"""
+        soup = get_soup(self.page_info())
+        self.title = soup.title.string[:-6]
+        table_novel_1 = soup.find(id='noveltable1')
+        self.user_id = table_novel_1.find('a')['href'][26:-1]
+        self.category = table_novel_1.find_all('td')[3].string
+        table_novel_2 = soup.find(id='noveltable2')
+        td_infos = table_novel_2.find_all('td')
+
+        year = int(td_infos[0].string[:4])
+        month = int(td_infos[0].string[6:8])
+        day = int(td_infos[0].string[9:11])
+        hour = int(td_infos[0].string[13:15])
+        minute = int(td_infos[0].string[16:18])
+        self.publication_date = datetime.datetime(year, month, day, hour, minute)
+
+        year = int(td_infos[1].string[:4])
+        month = int(td_infos[1].string[6:8])
+        day = int(td_infos[1].string[9:11])
+        hour = int(td_infos[1].string[13:15])
+        minute = int(td_infos[1].string[16:18])
+        self.last_date = datetime.datetime(year, month, day, hour, minute)
+
+        self.impression_count = int(prepare_str(td_infos[2].contents[0].string)[:-1])
+        self.review_count = int(prepare_str(td_infos[3].string)[:-1])
+        self.bookmark_count = int(prepare_str(td_infos[4].string)[:-1])
+        self.assessment = int(prepare_str(td_infos[5].string)[:-2])
+        raw_points = prepare_str(td_infos[6].contents[0].string).split('pt')
+        self.point_writing = int(raw_points[0])
+        self.point_story = int(raw_points[1][2:])
+        self.chara_count = int(prepare_str(td_infos[8].string)[:-2])
