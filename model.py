@@ -10,7 +10,7 @@ def get_soup(url):
 
 class User:
     def __init__(self, user_id, _novels=False, _blogs=False, _bookmarks=False, _following_users=True,
-                 _commented_novels=False, _review_list=False):
+                 _commented_novels=False, _review_list=False, _all=False):
         """init function"""
         self.id = user_id
         self.name = self.get_username()
@@ -21,6 +21,15 @@ class User:
         self.following_users = []
         self.commented_novels = []
         self.reviews = []
+
+        if _all:
+            self.list_novel()
+            self.list_blog()
+            self.list_bookmark()
+            self.list_following_user()
+            self.list_commented_novels()
+            self.list_reviews()
+            return
 
         if _novels:
             self.list_novel()
