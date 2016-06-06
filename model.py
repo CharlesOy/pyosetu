@@ -8,8 +8,11 @@ import datetime
 
 def get_soup(_url):
     """get soup object for a url"""
-    c = urllib2.urlopen(_url)
-    return bs4.BeautifulSoup(c.read(), 'html.parser')
+    try:
+        c = urllib2.urlopen(_url)
+        return bs4.BeautifulSoup(c.read(), 'html.parser')
+    except Exception, e:
+        print(Exception, e)
 
 
 def prepare_str(_str):
@@ -24,6 +27,8 @@ class User:
         """init function"""
         # user id
         self.id = user_id
+        # user state, 1 means active, 0 means inactive.
+        self.state = 1
         # user name
         self.name = self.get_username()
 
@@ -114,12 +119,17 @@ class User:
     def get_username(self):
         """get username"""
         soup = get_soup(self.page_home())
+        if soup is None:
+            self.state = 0
+            return None
         return soup.title.string
 
     @staticmethod
     def get_count(url, pos_to=-2):
         """decompose count from specific url"""
         soup = get_soup(url)
+        if soup is None:
+            return 0
         if soup.find(class_='allcount') is None:
             return 0
         return int(soup.find(class_='allcount').string[1:pos_to])
@@ -131,6 +141,8 @@ class User:
             return
         for i in range(1, (count - 1) / page_num + 2):
             soup = get_soup(self.page_novel_list(i))
+            if soup is None:
+                continue
             soup_novel_list = soup.find(id='novellist')
             if soup_novel_list is not None:
                 div_titles = soup_novel_list.find_all(class_='title')
@@ -149,6 +161,8 @@ class User:
             return
         for i in range(1, (count - 1) / page_num + 2):
             soup = get_soup(self.page_blog_list(i))
+            if soup is None:
+                continue
             soup_blog_list = soup.find(id='bloglistbg')
             if soup_blog_list is not None:
                 div_titles = soup_blog_list.find_all(class_='title')
@@ -166,6 +180,8 @@ class User:
             return
         for i in range(1, (count - 1) / page_num + 2):
             soup = get_soup(self.page_bookmark_list(i))
+            if soup is None:
+                continue
             soup_bookmark_list = soup.find(id='novellist')
             if soup_bookmark_list is not None:
                 li_titles = soup_bookmark_list.find_all(class_='title')
@@ -179,6 +195,8 @@ class User:
             return
         for i in range(1, (count - 1) / page_num + 2):
             soup = get_soup(self.page_following_list(i))
+            if soup is None:
+                continue
             soup_fav_user = soup.find(id='favuser')
             if soup_fav_user is not None:
                 a_links = soup_fav_user.find_all('a')
@@ -192,6 +210,8 @@ class User:
             return
         for i in range(1, (count - 1) / page_num + 2):
             soup = get_soup(self.page_commented_novel_list(i))
+            if soup is None:
+                continue
             soup_commented_novel_list = soup.find(id='novelpointlist')
             if soup_commented_novel_list is not None:
                 li_titles = soup_commented_novel_list.find_all(class_='title')
@@ -205,6 +225,8 @@ class User:
             return
         for i in range(1, (count - 1) / page_num + 2):
             soup = get_soup(self.page_review_list(i))
+            if soup is None:
+                continue
             soup_review_novel_list = soup.find(id='novelreviewlist')
             if soup_review_novel_list is not None:
                 li_review_titles = soup_review_novel_list.find_all(class_='review_title')
@@ -255,6 +277,9 @@ class Novel:
     def get_info(self):
         """retrieve detailed info from web"""
         soup = get_soup(self.page_info())
+        if soup is None:
+            return
+
         self.title = soup.title.string[:-6]
         table_novel_1 = soup.find(id='noveltable1')
         self.user_id = table_novel_1.find('a')['href'][26:-1]
