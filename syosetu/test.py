@@ -1,15 +1,15 @@
 """Test code.
 """
-import model
+import syosetu
 
 # users = [model.User('268339', _following_users=False, _review_list=True),
 #          model.User('161540', _following_users=False, _review_list=True),
 #          model.User('820000', _following_users=False, _review_list=True),
 #          model.User('500001', _following_users=False, _review_list=True)]
-users = [model.User('268339'),
-         model.User('161540'),
-         model.User('820000'),
-         model.User('500001')]
+users = [syosetu.User('268339'),
+         syosetu.User('161540'),
+         syosetu.User('820000'),
+         syosetu.User('500001')]
 
 for user in users:
     print('')
@@ -26,7 +26,7 @@ for user in users:
 
 print('')
 
-novel = model.Novel('n3311bu')
+novel = syosetu.Novel('n3311bu')
 novel.get_info()
 
 print(novel.id)
