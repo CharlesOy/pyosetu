@@ -1,4 +1,5 @@
-"""Models
+"""
+A Crawler for http://yomou.syosetu.com
 """
 
 import urllib2
