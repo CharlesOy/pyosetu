@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
 """
-A Crawler for http://yomou.syosetu.com
+A Crawler for 小説を読もう - http://yomou.syosetu.com
+By Charles Ouyang
+2016.06.24
 """
 
 import urllib2
@@ -8,7 +11,11 @@ import datetime
 
 
 def get_soup(_url):
-    """get soup object for a url"""
+    """
+    get soup object for a url
+    :param _url:
+    :return:
+    """
     try:
         c = urllib2.urlopen(_url)
         return bs4.BeautifulSoup(c.read(), 'html.parser')
@@ -17,15 +24,24 @@ def get_soup(_url):
 
 
 def prepare_str(_str):
-    """remove all '\n's, ','s and ' 's"""
+    """
+    remove all '\n's, ','s and ' 's
+    :param _str:
+    :return:
+    """
     return _str.replace('\n', '').replace(',', '').replace(' ', '')
 
 
 class User:
-    """User class, decompose key information with a user id"""
+    """
+    User class, decompose key information with a user id
+    """
 
     def __init__(self, user_id):
-        """init function"""
+        """
+        init function
+        :param user_id:
+        """
         # user id
         self.id = user_id
         # user state, 1 means active, 0 means inactive.
@@ -48,7 +64,17 @@ class User:
 
     def init(self, _novels=False, _blogs=False, _bookmarks=False, _following_users=False,
              _commented_novels=False, _review_list=False, _all=False):
-        """get info from web"""
+        """
+        get info from web
+        :param _novels:
+        :param _blogs:
+        :param _bookmarks:
+        :param _following_users:
+        :param _commented_novels:
+        :param _review_list:
+        :param _all:
+        :return:
+        """
         if _all:
             self.list_novel()
             self.list_blog()
@@ -73,52 +99,87 @@ class User:
 
     @staticmethod
     def correct_page_num(page):
+        """
+        page number should in [1,200]
+        :param page:
+        :return:
+        """
         if page < 0 or page > 200:
             return 1
         return page
 
     def page_home(self):
-        """home page url"""
+        """
+        home page url
+        :return:
+        """
         return 'http://mypage.syosetu.com/' + self.id + '/'
 
     def page_novel_list(self, page=1):
-        """novel list page url"""
+        """
+        novel list page url
+        :param page:
+        :return:
+        """
         self.correct_page_num(page)
         return 'http://mypage.syosetu.com/mypage/novellist/userid/' \
                + self.id + '/index.php?1=2&all=1&all2=1&all3=1&all4=1&p=' + str(page)
 
     def page_blog_list(self, page=1):
-        """blog list page url"""
+        """
+        blog list page url
+        :param page:
+        :return:
+        """
         self.correct_page_num(page)
         return 'http://mypage.syosetu.com/mypageblog/list/userid/' \
                + self.id + '/index.php?p=' + str(page)
 
     def page_bookmark_list(self, page=1):
-        """bookmark list page url"""
+        """
+        bookmark list page url
+        :param page:
+        :return:
+        """
         self.correct_page_num(page)
         return 'http://mypage.syosetu.com/mypagefavnovelmain/list/userid/' \
                + self.id + '/index.php?p=' + str(page)
 
     def page_following_list(self, page=1):
-        """following list page url"""
+        """
+        following list page url
+        :param page:
+        :return:
+        """
         self.correct_page_num(page)
         return 'http://mypage.syosetu.com/mypagefavuser/list/userid/' \
                + self.id + '/index.php?p=' + str(page)
 
     def page_commented_novel_list(self, page=1):
-        """commented novel list page url"""
+        """
+        commented novel list page url
+        :param page:
+        :return:
+        """
         self.correct_page_num(page)
         return 'http://mypage.syosetu.com/mypagenovelhyoka/list/userid/' \
                + self.id + '/index.php?p=' + str(page)
 
     def page_review_list(self, page=1):
-        """review list page url"""
+        """
+        review list page url
+        :param page:
+        :return:
+        """
         self.correct_page_num(page)
         return 'http://mypage.syosetu.com/mypage/reviewlist/userid/' \
                + self.id + '/index.php?p=' + str(page)
 
     def get_username(self):
-        """get username"""
+        """
+        get username
+        :return:
+        """
         soup = get_soup(self.page_home())
         if soup is None:
             self.state = 0
@@ -127,7 +188,12 @@ class User:
 
     @staticmethod
     def get_count(url, pos_to=-2):
-        """decompose count from specific url"""
+        """
+        decompose count from specific url
+        :param url:
+        :param pos_to:
+        :return:
+        """
         soup = get_soup(url)
         if soup is None:
             return 0
@@ -136,7 +202,11 @@ class User:
         return int(soup.find(class_='allcount').string[1:pos_to])
 
     def list_novel(self, page_num=10):
-        """get novel list"""
+        """
+        get novel list
+        :param page_num:
+        :return:
+        """
         count = self.get_count(self.page_novel_list())
         if count == 0:
             return
@@ -152,11 +222,19 @@ class User:
 
     @staticmethod
     def page_novel_info(novel_id):
-        """novel detailed url"""
+        """
+        novel detailed url
+        :param novel_id:
+        :return:
+        """
         return 'http://ncode.syosetu.com/novelview/infotop/ncode/' + novel_id + '/'
 
     def list_blog(self, page_num=10):
-        """get blog list"""
+        """
+        get blog list
+        :param page_num:
+        :return:
+        """
         count = self.get_count(self.page_blog_list())
         if count == 0:
             return
@@ -171,11 +249,19 @@ class User:
                     self.blogs.append(div_title.find('a')['href'][39:-1].encode('unicode-escape'))
 
     def page_blog(self, blog_id):
-        """blog page url"""
+        """
+        blog page url
+        :param blog_id:
+        :return:
+        """
         return 'http://mypage.syosetu.com/mypageblog/view/userid/' + self.id + '/blogkey/' + blog_id + '/'
 
     def list_bookmark(self, page_num=10):
-        """get bookmark list"""
+        """
+        get bookmark list
+        :param page_num:
+        :return:
+        """
         count = self.get_count(self.page_bookmark_list())
         if count == 0:
             return
@@ -190,7 +276,11 @@ class User:
                     self.bookmarks.append(li_title.find('a')['href'][25:-1].encode('unicode-escape'))
 
     def list_following_user(self, page_num=10):
-        """get following user list"""
+        """
+        get following user list
+        :param page_num:
+        :return:
+        """
         count = self.get_count(self.page_following_list(), -1)
         if count == 0:
             return
@@ -205,7 +295,11 @@ class User:
                     self.following_users.append(soupLink['href'][1:-1].encode('unicode-escape'))
 
     def list_commented_novels(self, page_num=10):
-        """get commented novel list"""
+        """
+        get commented novel list
+        :param page_num:
+        :return:
+        """
         count = self.get_count(self.page_commented_novel_list())
         if count == 0:
             return
@@ -220,7 +314,11 @@ class User:
                     self.commented_novels.append(li_title.find('a')['href'][25:-1].encode('unicode-escape'))
 
     def list_reviews(self, page_num=10):
-        """get review novel list"""
+        """
+        get review novel list
+        :param page_num:
+        :return:
+        """
         count = self.get_count(self.page_review_list())
         if count == 0:
             return
@@ -236,15 +334,24 @@ class User:
 
     @staticmethod
     def page_review(review_id):
-        """review page"""
+        """
+        review page
+        :param review_id:
+        :return:
+        """
         return 'http://novelcom.syosetu.com/novelreview/list/ncode/' + review_id + '/'
 
 
 class Novel:
-    """Novel class, decompose key information with a novel id"""
+    """
+    Novel class, decompose key information with a novel id
+    """
 
     def __init__(self, novel_id):
-        """init function"""
+        """
+        init function
+        :param novel_id:
+        """
         self.id = novel_id
         # title
         self.title = None
@@ -272,11 +379,17 @@ class Novel:
         self.chara_count = 0
 
     def page_info(self):
-        """info page url"""
+        """
+        info page url
+        :return:
+        """
         return 'http://ncode.syosetu.com/novelview/infotop/ncode/' + self.id + '/'
 
     def get_info(self):
-        """retrieve detailed info from web"""
+        """
+        retrieve detailed info from web
+        :return:
+        """
         soup = get_soup(self.page_info())
         if soup is None:
             return
