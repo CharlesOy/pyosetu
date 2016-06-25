@@ -2,7 +2,7 @@
 """
 A Crawler for 小説を読もう - http://yomou.syosetu.com
 小説を読もう is the largest online Japanese light novel website.
-NOTE this crawler is designed only for user data analysis rather than a novel crawler.
+NOTE This crawler is designed to provide user data for analysis rather than a novel content crawler.
 By Charles Ouyang
 2016.06.03
 """
