@@ -29,10 +29,15 @@ class Word:
         init method
         :param _japanese:
         """
+        # Japanese word
         self.japanese = _japanese
+        # Japanese kana
         self.kana = None
+        # romaji for Japanese word
         self.romaji = None
+        # word property
         self.property = None
+        # Chinese meaning
         self.chinese = None
 
         self.translate()
@@ -70,6 +75,7 @@ class Word:
         self.kana = soup_word.find_all(class_='trs_jp')[0].string[1:-1]
         self.romaji = soup_word.find_all(class_='trs_jp')[1].string[1:-1]
 
+        # there are two kind of structures, one of which could be missing
         if len(soup_word.find_all(class_='simple_content')) != 0:
             self.property = soup_word.find_all(class_='simple_content')[0].find('b').string[1:-1]
             self.chinese = soup_word.find_all(class_='simple_content')[0].contents[2]
@@ -77,8 +83,6 @@ class Word:
             self.property = soup_word.find_all(class_='tip_content_item')[0].string[1:-2]
             self.chinese = soup_word.find_all(class_='soundmark_color')[0].string
 
+        # examples TBD
+
         return soup_word
-
-
-if __name__ == '__main__':
-    print(Word('テスト'))
