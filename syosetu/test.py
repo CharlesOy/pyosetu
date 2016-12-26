@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Test code.
 """
@@ -23,8 +24,8 @@ if __name__ == '__main__':
         print(user.novels)
         print(user.blogs)
         print(user.bookmarks)
-        print(user.following_users)
-        print(user.commented_novels)
+        print(user.followingUsers)
+        print(user.commentedNovels)
         print(user.reviews)
 
     print('')

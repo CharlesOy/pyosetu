@@ -8,6 +8,7 @@ By Charles Ouyang
 
 import urllib
 import urllib2
+import bs4
 import json
 
 # request header
@@ -20,9 +21,24 @@ req_header = {
 }
 
 
+def get_soup(_request):
+    """
+    get soup object for a url
+    :param _request:
+    :return:
+    """
+    try:
+        c = urllib2.urlopen(_request)
+        return bs4.BeautifulSoup(c.read(), 'html.parser')
+    except Exception, e:
+        print(Exception, e)
+
+
 class SearchAction:
     """
     A search action on lagou.com with all conditions allowed
+    A demo url is like:
+    gj=3年及以下&xl=本科&jd=天使轮&hy=移动互联网&px=default&yx=15k-25k&gx=全职&city=北京&district=朝阳区&bizArea=大山子#order
     """
 
     def __init__(self, _kd, _city, _district=None, _gj=None, _xl=None, _jd=None, _hy=None, _yx=None, _gx=None, _px=None,
@@ -80,7 +96,7 @@ class SearchAction:
     def get_request(self):
         """
         produce request
-        # http://www.lagou.com/jobs/positionAjax.json?city=%E5%8C%97%E4%BA%AC&needAddtionalResult=false
+        DEMO URL: http://www.lagou.com/jobs/positionAjax.json?city=%E5%8C%97%E4%BA%AC&needAddtionalResult=false
         :return:
         """
         url = 'http://www.lagou.com/jobs/positionAjax.json?'
@@ -94,10 +110,80 @@ class SearchAction:
 class Job:
     """
     Detailed job info
+    TBD
     """
 
-    def __init__(self, id):
+    def __init__(self, _position_id, _position_name=None, _position_type=None, _salary=None, _company_name=None,
+                 _company_short_name=None, _company_size=None, _city=None, _district=None, _business_zones=None,
+                 _company_label_list=None, _education=None, _work_year=None, _job_nature=None, _industry_field=None,
+                 _create_time=None, _finance_stage=None, _position_advantage=None):
         """
         init method
+        :param _position_id: position id
+        :param _position_name: position name
+        :param _position_type: position type
+        :param _salary: salary range
+        :param _company_name: company name
+        :param _company_short_name: company full name
+        :param _company_size: company size
+        :param _city: city
+        :param _district: district
+        :param _business_zones: business zones
+        :param _company_label_list: company label list
+        :param _education: education
+        :param _work_year: work year
+        :param _job_nature: job type
+        :param _industry_field: industry field
+        :param _create_time: creating time
+        :param _finance_stage: finance stage
+        :param _position_advantage: position advantages
         """
+        # brief info
+        self.id = _position_id
+        self.positionName = _position_name
+        self.positionType = _position_type
+        self.positionAdvantage = _position_advantage
+        self.salary = _salary
+        self.companyName = _company_name
+        self.companyShortName = _company_short_name
+        self.companySize = _company_size
+        self.companyZones = _business_zones
+        self.companyLabelList = _company_label_list
+        self.city = _city
+        self.district = _district
+        self.education = _education
+        self.workYear = _work_year
+        self.jobNature = _job_nature
+        self.industryField = _industry_field
+        self.createTime = _create_time
+        self.financeStage = _finance_stage
+        # detailed info TBD
+        self.content = 'TBD'
+
+    def to_dic(self):
+        print(dir(self))
+        for entry in self:
+            print(entry)
         pass
+
+
+if __name__ == '__main__':
+
+    # first=false&pn=1&kd=Python
+    # kd=Python&pn=2&first=false
+
+    sa = SearchAction('Python', '北京', _pn=1)
+    print(sa.get_request().get_full_url())
+    print(sa.get_request().get_data())
+    print('')
+
+    jobList = []
+    for job in sa.result['positionResult']['result']:
+        jobObj = Job(job['positionId'], job['positionName'], job['positionType'], job['salary'], job['companyName'],
+                     job['companyShortName'], job['companySize'], job['city'], job['district'], job['businessZones'],
+                     job['companyLabelList'], job['education'], job['workYear'], job['jobNature'], job['industryField'],
+                     job['createTime'], job['financeStage'], job['positionAdvantage'])
+        jobObj.to_dic()
+        # print(jobObj.education + '\t' + jobObj.salary + '\t' + jobObj.positionName)
+        # print('')
+        # print(job[''])

@@ -58,9 +58,9 @@ class User:
         # bookmarked novels
         self.bookmarks = []
         # user id list followed by current user
-        self.following_users = []
+        self.followingUsers = []
         # commented novels
-        self.commented_novels = []
+        self.commentedNovels = []
         # reviews received
         self.reviews = []
 
@@ -294,7 +294,7 @@ class User:
             if soup_fav_user is not None:
                 a_links = soup_fav_user.find_all('a')
                 for soupLink in a_links:
-                    self.following_users.append(soupLink['href'][1:-1].encode('unicode-escape'))
+                    self.followingUsers.append(soupLink['href'][1:-1].encode('unicode-escape'))
 
     def list_commented_novels(self, page_num=10):
         """
@@ -313,7 +313,7 @@ class User:
             if soup_commented_novel_list is not None:
                 li_titles = soup_commented_novel_list.find_all(class_='title')
                 for li_title in li_titles:
-                    self.commented_novels.append(li_title.find('a')['href'][25:-1].encode('unicode-escape'))
+                    self.commentedNovels.append(li_title.find('a')['href'][25:-1].encode('unicode-escape'))
 
     def list_reviews(self, page_num=10):
         """
