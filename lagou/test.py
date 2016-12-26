@@ -17,7 +17,7 @@ if __name__ == '__main__':
 
     for job in sa.result['positionResult']['result']:
         print(job['city'])
-        print(job['companyName'])
+        # print(job['companyName'])
         print(json.dumps(job['businessZones'], ensure_ascii=False))
         print(json.dumps(job['companyLabelList'], ensure_ascii=False))
         print(job['companyShortName'])
